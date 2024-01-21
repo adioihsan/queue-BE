@@ -1,5 +1,7 @@
 const prisma = require("../../prisma/prisma");
 const bcrypt = require("bcrypt");
+const tokenServices = require("../services/token.service");
+
 const { body, validationResult } = require("express-validator");
 
 async function hashPassword(plainText) {
@@ -8,10 +10,16 @@ async function hashPassword(plainText) {
   return hash;
 }
 
+async function comparePassword(plainText, hashedPassword) {
+  const compareResult = await bcrypt.compare(plainText, hashedPassword);
+  return compareResult;
+}
+
 const AuthController = {
+  // register
   registerOwner: async (req, res) => {
-    console.log(req.body);
     try {
+      // form validation
       const validationFormResult = validationResult(req);
       if (!validationFormResult.isEmpty())
         return res.status(400).json({
@@ -19,7 +27,9 @@ const AuthController = {
           message: "invalid input",
           error: validationFormResult.array(),
         });
+      // end form validation
 
+      // check user
       const isUserExisit = await prisma.user.findFirst({
         where: {
           OR: [{ username: req.body.username }, { email: req.body.email }],
@@ -30,6 +40,7 @@ const AuthController = {
           success: false,
           message: "Username or Email Already Registered",
         });
+      // end check user
 
       const password = await hashPassword(req.body.password);
       await prisma.user.create({
@@ -39,7 +50,7 @@ const AuthController = {
           password: password,
         },
       });
-      return res.status(2000).json({
+      return res.status(200).json({
         success: true,
         message: "Registration success",
         data: {
@@ -53,7 +64,7 @@ const AuthController = {
       console.log(error);
       return res.status(500).json({
         success: false,
-        message: "Server Error",
+        message: "Internal server Error",
         data: {},
       });
     }
@@ -63,6 +74,70 @@ const AuthController = {
     // body("password").isStrongPassword({ minLength: 8, minNumbers: 1 }),
     body("password").isLength({ min: 6, max: 50 }),
     body("username").isLength({ min: 6, max: 50 }),
+  ],
+  //endregister
+
+  loginOwner: async (req, res) => {
+    try {
+      const validationFormResult = validationResult(req);
+      // form validation
+      if (!validationFormResult.isEmpty())
+        return res.status(400).json({
+          success: "false",
+          message: "invalid input",
+          error: validationFormResult.array(),
+        });
+      // end form validation
+
+      // check user
+      const isUserExisit = await prisma.user.findUnique({
+        where: { email: req.body.email },
+      });
+      if (!isUserExisit)
+        return res.status(400).json({
+          success: false,
+          message: "User not registered",
+          data: {},
+        });
+      // end checkuser
+
+      // check password
+      const isPassValid = await comparePassword(
+        req.body.password,
+        isUserExisit.password
+      );
+      if (!isPassValid)
+        return res.status(400).json({
+          success: false,
+          message: "Wrong password",
+        });
+      // end check password
+
+      // generate token
+      const accessToken = tokenServices.generateAccessToken(
+        isUserExisit.username,
+        isUserExisit.role
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Login success",
+        data: {
+          token: accessToken,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server Error",
+        data: {},
+      });
+    }
+  },
+  validationLogin: [
+    body("email").isEmail(),
+    body("password").isLength({ min: 6, max: 50 }),
   ],
 };
 

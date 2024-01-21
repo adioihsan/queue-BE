@@ -8,4 +8,6 @@ AuthRouter.route("/register").post(
   AuthController.registerOwner
 );
 
+AuthRouter.route("/login").post(AuthController.loginOwner);
+
 module.exports = AuthRouter;

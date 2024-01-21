@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
-const port = 5000;
+const dotenv = require("dotenv");
+dotenv.config();
+const port = process.env.PORT;
 var multer = require("multer");
 const ApiRouter = require("./routes/index");
 const bodyParser = require("body-parser");
