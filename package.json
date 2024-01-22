@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon --inspect ./src/app.js",
     "start": "nodemon ./src/app.js ",
+    "build": "prisma generate --schema src/model/schema.prisma && vercel build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "san",
