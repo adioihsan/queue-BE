@@ -19,6 +19,10 @@ app.use(upload.array());
 
 app.use("/v1/", ApiRouter);
 
+app.get("/", (req, res) => {
+  res.send("Queue API");
+});
+
 app.listen(port, () => {
   console.log("http://localhost:5000");
   console.log(`Example app listening on port ${port}`);
