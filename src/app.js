@@ -23,5 +23,3 @@ app.listen(port, () => {
   console.log("http://localhost:5000");
   console.log(`Example app listening on port ${port}`);
 });
-
-module.exports = app;
