@@ -4,10 +4,10 @@
     {
       "src": "src/app.js",
       "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/**"] },
-      "buildCommand": "prisma generate --schema src/model/schema.prisma && vercel build"
+      "config": { "includeFiles": ["dist/**"] }
     }
   ],
+  "buildCommand": "prisma generate --schema src/model/schema.prisma",
   "routes": [
     {
       "src": "/(.*)",
