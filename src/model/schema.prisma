@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//models
+
+model User{
+  id                    Int                   @id @default(autoincrement())
+  email             String              @unique
+  username     String?
+  password      String
+  role                Role                @default(OWNER)
+  profile           Profile?
+  queue           Queue[] 
+  created_at      DateTime       @default(now())
+  updated_at     DateTime?       
+
+}
+
+model Profile{
+  id                     Int                      @id     @default(autoincrement())
+  business_name        String 
+  address         String
+  user                User                  @relation(fields: [user_id], references: [id])
+  user_id           Int                   @unique
+  created_at     DateTime       @default(now())
+  updated_at     DateTime?      
+}
+
+model Queue{
+  id                        Int             @id     @default(autoincrement())
+  queue_name   String        @unique
+  user                    User           @relation(fields: [user_id], references: [id])
+  user_id               Int             
+  verify_code      String         @unique
+  is_public            Boolean    @default(true)
+  note                    String?
+  path                    String
+  queueur            Queueur[]
+   
+}
+
+model Queueur{
+  id                          Int                     @id     @default(autoincrement())
+  queue_code        Int
+  order_number   Int 
+  note                     String?
+  queue                 Queue    @relation(fields: [queue_id], references: [id])
+  queue_id             Int
+  enroll_at             DateTime        @default(now())
+  checkin_at         DateTime?
+}
+
+
+enum Role {
+  CUSTOMER
+  OWNER
+}
