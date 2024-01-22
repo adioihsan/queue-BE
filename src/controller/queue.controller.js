@@ -2,9 +2,9 @@ const { body, validationResult } = require("express-validator");
 const prisma = require("../model/prisma");
 const randomstring = require("randomstring");
 
-const checkQueueName = async (name) => {
-  const queue = await prisma.queue.findUnique({
-    where: { queue_name: name },
+const checkQueueName = async (name, userId) => {
+  const queue = await prisma.queue.findFirst({
+    where: { AND: [{ queue_name: name }, { user_id: userId }] },
   });
   return queue == null;
 };
@@ -32,6 +32,7 @@ const queueController = {
           queue_name: req.body.queueName,
           user_id: req.user.id,
           is_public: Boolean(req.body.isPublic),
+          note: req.body.note,
           verify_code: randomstring.generate(10),
         },
       });
@@ -50,8 +51,9 @@ const queueController = {
   },
 
   validateCreate: [
-    body("queue_name").isLength({ min: 6, max: 40 }),
-    body("is_public").isBoolean(),
+    body("queueName").isLength({ min: 6, max: 40 }),
+    body("isPublic").isBoolean(),
+    body("note").optional().isLength({ max: 60 }),
   ],
 };
 

@@ -42,18 +42,20 @@ model Queue{
   user_id               Int             
   verify_code      String         @unique
   is_public            Boolean    @default(true)
+  note                    String?     
   queueur            Queueur[]
+   
 }
 
 model Queueur{
   id                          Int                     @id     @default(autoincrement())
   queue_code        Int
   order_number   Int 
-  note                     String
+  note                     String?
   queue                 Queue    @relation(fields: [queue_id], references: [id])
   queue_id             Int
   enroll_at             DateTime        @default(now())
-  checkin_at         DateTime
+  checkin_at         DateTime?
 }
 
 

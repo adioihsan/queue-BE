@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Queue" ALTER COLUMN "note" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "Queueur" ALTER COLUMN "note" DROP NOT NULL,
+ALTER COLUMN "checkin_at" DROP NOT NULL;
