@@ -7,7 +7,7 @@
       "config": { "includeFiles": ["dist/**"] }
     }
   ],
-  "buildCommand": "prisma generate --schema src/model/schema.prisma",
+  "installCommand": "npm install && prisma generate --schema src/model/schema.prisma",
   "routes": [
     {
       "src": "/(.*)",
