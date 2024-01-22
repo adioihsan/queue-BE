@@ -19,6 +19,17 @@ const queueController = {
           error: validationResult(req).array(),
         });
 
+      // check if profile already filled
+      const userProfile = await prisma.profile.findFirst({
+        where: { user_id: req.user.id },
+      });
+      if (!userProfile)
+        return res.status(428).json({
+          success: false,
+          message: "Profile need to be filled",
+        });
+
+      // check is name available
       const isNameAvail = await checkQueueName(req.body.queueName);
       if (!isNameAvail)
         return res.status(400).json({
@@ -37,9 +48,19 @@ const queueController = {
         },
       });
 
-      console.log(queue);
+      let queue_path = `${userProfile.business_name}/${queue.queue_name}`;
+      queue_path = queue_path.replace(/ /g, "");
 
-      return res.send(queue);
+      return res.status(201).json({
+        success: true,
+        message: "Queue created successfully",
+        data: {
+          queueName: queue.queue_name,
+          verifyCode: queue.verify_code,
+          note: queue.note,
+          path: queue_path,
+        },
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
