@@ -7,10 +7,6 @@ var multer = require("multer");
 const ApiRouter = require("./route/index");
 const bodyParser = require("body-parser");
 const upload = multer();
-const morgan = require("morgan");
-
-// logging using morgan
-app.use(morgan("combined"));
 
 // urlenconded form
 app.use(bodyParser.urlencoded({ extended: true }));
