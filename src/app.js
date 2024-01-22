@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const port = process.env.PORT;
 var multer = require("multer");
-const ApiRouter = require("./routes/index");
+const ApiRouter = require("./route/index");
 const bodyParser = require("body-parser");
 const upload = multer();
 

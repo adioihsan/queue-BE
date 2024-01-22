@@ -1,6 +1,6 @@
-const prisma = require("../../prisma/prisma");
+const prisma = require("../model/prisma");
 const bcrypt = require("bcrypt");
-const tokenServices = require("../services/token.service");
+const tokenServices = require("../service/token.service");
 
 const { body, validationResult } = require("express-validator");
 
@@ -15,7 +15,7 @@ async function comparePassword(plainText, hashedPassword) {
   return compareResult;
 }
 
-const AuthController = {
+const authController = {
   // register
   registerOwner: async (req, res) => {
     try {
@@ -45,7 +45,7 @@ const AuthController = {
       const password = await hashPassword(req.body.password);
       await prisma.user.create({
         data: {
-          username: req.body.email,
+          username: req.body.username,
           email: req.body.email,
           password: password,
         },
@@ -90,10 +90,10 @@ const AuthController = {
       // end form validation
 
       // check user
-      const isUserExisit = await prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { email: req.body.email },
       });
-      if (!isUserExisit)
+      if (!user)
         return res.status(400).json({
           success: false,
           message: "User not registered",
@@ -104,7 +104,7 @@ const AuthController = {
       // check password
       const isPassValid = await comparePassword(
         req.body.password,
-        isUserExisit.password
+        user.password
       );
       if (!isPassValid)
         return res.status(400).json({
@@ -115,8 +115,9 @@ const AuthController = {
 
       // generate token
       const accessToken = tokenServices.generateAccessToken(
-        isUserExisit.username,
-        isUserExisit.role
+        user.id,
+        user.email,
+        user.role
       );
 
       return res.status(200).json({
@@ -141,4 +142,4 @@ const AuthController = {
   ],
 };
 
-module.exports = AuthController;
+module.exports = authController;
