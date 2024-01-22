@@ -3,9 +3,11 @@
   "builds": [
     {
       "src": "src/app.js",
+      "use": "@vercel/node",
       "config": { "includeFiles": ["dist/**"] }
     }
   ],
+  "buildCommand": "prisma generate --schema src/model/schema.prisma",
   "routes": [
     {
       "src": "/(.*)",
