@@ -43,6 +43,7 @@ model Queue{
   verify_code      String         @unique
   is_public            Boolean    @default(true)
   note                    String?
+  path                    String
   queueur            Queueur[]
    
 }

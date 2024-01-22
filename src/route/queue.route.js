@@ -14,4 +14,6 @@ QueueRouter.route("/show/:queueName").get(
   queueController.show
 );
 
+QueueRouter.route("/showAll").get(ownerMiddleware, queueController.showAll);
+
 module.exports = QueueRouter;

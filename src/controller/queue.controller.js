@@ -9,6 +9,13 @@ const checkQueueName = async (name, userId) => {
   return queue == null;
 };
 
+const checkCustomPath = async (path) => {
+  const queue = await prisma.queue.findFirst({
+    where: { path },
+  });
+  return queue == null;
+};
+
 const queueController = {
   create: async (req, res) => {
     try {
@@ -23,6 +30,7 @@ const queueController = {
       const userProfile = await prisma.profile.findFirst({
         where: { user_id: req.user.id },
       });
+
       if (!userProfile)
         return res.status(428).json({
           success: false,
@@ -38,18 +46,30 @@ const queueController = {
           data: {},
         });
 
+      // check if custom path available
+      let queue_path = `/${userProfile.business_name}/${req.body.queueName}`;
+      queue_path = queue_path.replace(/ /g, "");
+      if (req.body.customPath) {
+        const isPathAvail = checkCustomPath(req.body.customPath);
+        if (!isPathAvail)
+          return res.status(400).json({
+            success: false,
+            message: "Custom path already exist",
+            data: {},
+          });
+        queue_path = req.body.customPath;
+      }
+
       const queue = await prisma.queue.create({
         data: {
           queue_name: req.body.queueName,
           user_id: req.user.id,
           is_public: Boolean(req.body.isPublic),
           note: req.body.note,
+          path: queue_path,
           verify_code: randomstring.generate(10),
         },
       });
-
-      let queue_path = `${userProfile.business_name}/${queue.queue_name}`;
-      queue_path = queue_path.replace(/ /g, "");
 
       return res.status(201).json({
         success: true,
@@ -60,7 +80,7 @@ const queueController = {
           business_name: userProfile.business_name,
           verifyCode: queue.verify_code,
           note: queue.note,
-          path: queue_path,
+          path: queue.path,
         },
       });
     } catch (error) {
@@ -76,10 +96,7 @@ const queueController = {
     try {
       const queue = await prisma.queue.findFirst({
         where: {
-          AND: [
-            { queue_name: req.params.queue_name },
-            { user_id: req.user.id },
-          ],
+          AND: [{ queue_name: req.params.queueName }, { user_id: req.user.id }],
         },
       });
       if (!queue)
@@ -103,10 +120,30 @@ const queueController = {
       });
     }
   },
+  showAll: async (req, res) => {
+    try {
+      const allQueues = await prisma.queue.findMany({
+        where: { user_id: req.user.id },
+      });
+      return res.status(200).json({
+        success: true,
+        message: "Showing all queue",
+        data: { allQueues },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server Error",
+        data: {},
+      });
+    }
+  },
   validateCreate: [
     body("queueName").isLength({ min: 6, max: 40 }),
     body("isPublic").isBoolean(),
     body("note").optional().isLength({ max: 60 }),
+    body("customPath").optional().isLength({ min: 6, max: 40 }),
   ],
 };
 
