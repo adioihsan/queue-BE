@@ -4,5 +4,6 @@ const ApiRouter = require("express").Router();
 
 ApiRouter.use("/auth", require("./auth.route"));
 ApiRouter.use("/queue", require("./queue.route"));
+ApiRouter.use("/profile", require("./profile.route"));
 
 module.exports = ApiRouter;

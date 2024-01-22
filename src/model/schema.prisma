@@ -21,7 +21,7 @@ model User{
   profile           Profile?
   queue           Queue[] 
   created_at      DateTime       @default(now())
-  updated_at     DateTime       @default(now())
+  updated_at     DateTime?       
 
 }
 
@@ -32,7 +32,7 @@ model Profile{
   user                User                  @relation(fields: [user_id], references: [id])
   user_id           Int                   @unique
   created_at     DateTime       @default(now())
-  updated_at     DateTime       @default(now()) 
+  updated_at     DateTime?      
 }
 
 model Queue{
@@ -42,7 +42,7 @@ model Queue{
   user_id               Int             
   verify_code      String         @unique
   is_public            Boolean    @default(true)
-  note                    String?     
+  note                    String?
   queueur            Queueur[]
    
 }
