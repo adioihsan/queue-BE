@@ -9,7 +9,7 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'OWNER',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -21,7 +21,7 @@ CREATE TABLE "Profile" (
     "address" TEXT NOT NULL,
     "user_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "Profile_pkey" PRIMARY KEY ("id")
 );
@@ -33,6 +33,8 @@ CREATE TABLE "Queue" (
     "user_id" INTEGER NOT NULL,
     "verify_code" TEXT NOT NULL,
     "is_public" BOOLEAN NOT NULL DEFAULT true,
+    "note" TEXT,
+    "path" TEXT NOT NULL,
 
     CONSTRAINT "Queue_pkey" PRIMARY KEY ("id")
 );
@@ -42,10 +44,10 @@ CREATE TABLE "Queueur" (
     "id" SERIAL NOT NULL,
     "queue_code" INTEGER NOT NULL,
     "order_number" INTEGER NOT NULL,
-    "note" TEXT NOT NULL,
+    "note" TEXT,
     "queue_id" INTEGER NOT NULL,
     "enroll_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "checkin_at" TIMESTAMP(3) NOT NULL,
+    "checkin_at" TIMESTAMP(3),
 
     CONSTRAINT "Queueur_pkey" PRIMARY KEY ("id")
 );
