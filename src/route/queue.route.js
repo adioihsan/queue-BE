@@ -9,4 +9,9 @@ QueueRouter.route("/create").post(
   queueController.create
 );
 
+QueueRouter.route("/show/:queueName").get(
+  ownerMiddleware,
+  queueController.show
+);
+
 module.exports = QueueRouter;

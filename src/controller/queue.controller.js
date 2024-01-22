@@ -55,7 +55,9 @@ const queueController = {
         success: true,
         message: "Queue created successfully",
         data: {
+          id: queue.id,
           queueName: queue.queue_name,
+          business_name: userProfile.business_name,
           verifyCode: queue.verify_code,
           note: queue.note,
           path: queue_path,
@@ -70,7 +72,37 @@ const queueController = {
       });
     }
   },
+  show: async (req, res) => {
+    try {
+      const queue = await prisma.queue.findFirst({
+        where: {
+          AND: [
+            { queue_name: req.params.queue_name },
+            { user_id: req.user.id },
+          ],
+        },
+      });
+      if (!queue)
+        return res.status(404).json({
+          success: false,
+          message: "Queue not found",
+          data: {},
+        });
 
+      res.status(200).json({
+        success: true,
+        message: "Found the queue",
+        data: { queue },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server Error",
+        data: {},
+      });
+    }
+  },
   validateCreate: [
     body("queueName").isLength({ min: 6, max: 40 }),
     body("isPublic").isBoolean(),
